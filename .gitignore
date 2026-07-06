@@ -1,0 +1,38 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Raw CSV datasets optional
+tmdb_5000_movies.csv
+tmdb_5000_credits.csv
+
+backend/similarity.pkl
+similarity.pklbackend/similarity.pkl
+similarity.pkl
+backend/.env
+.env
+node_modules/
+dist/
+__pycache__/
+*.pyc
+backend/similarity.pkl
+similarity.pkl
+backend/.env
+.env
+node_modules/
+dist/
+__pycache__/
+*.pyc

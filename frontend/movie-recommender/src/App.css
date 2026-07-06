@@ -1,0 +1,770 @@
+/* =============================================================
+   DESIGN TOKENS
+   A small cinema/marquee palette — deep charcoal background,
+   marquee gold as the hero accent, teal as a secondary accent.
+   ============================================================= */
+:root {
+  --bg: #101014;
+  --bg-alt: #17171f;
+  --card: #1c1c26;
+  --card-border: #2a2a37;
+
+  --gold: #e8b34c;
+  --gold-dim: #b98b2e;
+  --teal: #4fbfb3;
+  --red: #e8604a;
+
+  --text: #f3f0e8;
+  --text-dim: #a9a6b4;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'Space Mono', monospace;
+
+  --radius: 14px;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================================
+   HERO / MARQUEE
+   A strip of "bulbs" along the top that gently pulse, like the
+   lights around an old cinema marquee sign.
+   ============================================================= */
+.marquee {
+  position: relative;
+  background: radial-gradient(circle at top, #1c1a2b 0%, #101014 70%);
+  padding: 3.5rem 1.5rem 4rem;
+  text-align: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.marquee__bulbs {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0.75rem 1rem 0;
+}
+
+.bulb {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  box-shadow: 0 0 4px var(--gold-dim);
+  animation: flicker 3.2s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    background: var(--gold-dim);
+    box-shadow: 0 0 4px var(--gold-dim);
+  }
+  50% {
+    background: var(--gold);
+    box-shadow: 0 0 10px var(--gold);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bulb {
+    animation: none;
+  }
+}
+
+.marquee__content {
+  position: relative;
+  max-width: 640px;
+  margin: 1.5rem auto 0;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 9vw, 5.5rem);
+  letter-spacing: 0.03em;
+  margin: 0;
+  line-height: 1;
+  color: var(--text);
+  text-shadow: 0 0 24px rgba(232, 179, 76, 0.25);
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 1rem auto 0;
+  max-width: 480px;
+}
+
+/* =============================================================
+   MAIN CONTENT
+   ============================================================= */
+.content {
+  flex: 1;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* --- Search / "ticket counter" -------------------------------- */
+.search-counter {
+  background: var(--bg-alt);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2.5rem;
+}
+
+.search-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.6rem;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.search-row input {
+  flex: 1 1 240px;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: var(--font-body);
+}
+
+.search-row input:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.search-row button {
+  padding: 0.85rem 1.75rem;
+  border-radius: 10px;
+  border: none;
+  background: var(--gold);
+  color: #1a1408;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.search-row button:hover:not(:disabled) {
+  background: #f0c168;
+  transform: translateY(-1px);
+}
+
+.search-row button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.search-row button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* --- Loading / error status blocks ------------------------------ */
+.status-block {
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--card-border);
+}
+
+.status-block.loading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-alt);
+  color: var(--text-dim);
+}
+
+.reel {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--card-border);
+  border-top-color: var(--gold);
+  animation: spin 0.9s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status-block.error {
+  background: rgba(232, 96, 74, 0.08);
+  border-color: rgba(232, 96, 74, 0.35);
+}
+
+.error-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.suggestions {
+  margin-top: 1rem;
+}
+
+.suggestions-label {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.chip {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  color: var(--teal);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--teal);
+  transform: translateY(-1px);
+}
+
+/* --- Results header --------------------------------------------- */
+.results-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.results-header h2 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.15rem;
+  margin: 0;
+}
+
+.mock-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(232, 179, 76, 0.1);
+  border: 1px solid rgba(232, 179, 76, 0.35);
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* =============================================================
+   TICKET-STUB MOVIE CARDS
+   The signature element: each recommendation looks like a torn
+   cinema ticket, complete with a perforated edge and stub.
+   ============================================================= */
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.ticket {
+  display: flex;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ticket:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+}
+
+.ticket__main {
+  flex: 1;
+  padding: 1.25rem 1.1rem;
+  min-width: 0;
+}
+
+.ticket__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin: 0 0 0.5rem;
+}
+
+.ticket__title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.ticket__seat {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+/* The perforated stub on the right, torn away from the main ticket */
+.ticket__stub {
+  position: relative;
+  width: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+  border-left: 2px dashed var(--card-border);
+}
+
+.ticket__stub::before,
+.ticket__stub::after {
+  content: '';
+  position: absolute;
+  left: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+}
+
+.ticket__stub::before {
+  top: -7px;
+}
+
+.ticket__stub::after {
+  bottom: -7px;
+}
+
+.ticket__code {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--gold);
+  writing-mode: vertical-rl;
+  letter-spacing: 0.05em;
+}
+
+/* =============================================================
+   FOOTER
+   ============================================================= */
+.footer {
+  text-align: center;
+  padding: 1.75rem 1.5rem 2.25rem;
+  border-top: 1px solid var(--card-border);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+/* =============================================================
+   RESPONSIVE TWEAKS
+   ============================================================= */
+@media (max-width: 480px) {
+  .marquee {
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  .search-row {
+    flex-direction: column;
+  }
+
+  .search-row button {
+    width: 100%;
+  }
+
+  .ticket-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==============================
+   Search row layout fix
+   ============================== */
+
+.search-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+}
+
+.movie-dropdown {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Input style according to website theme */
+.movie-dropdown input {
+  width: 100%;
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 185, 66, 0.45);
+  background: #0d0d14;
+  color: #f7f1e8;
+  font-size: 16px;
+  outline: none;
+}
+
+.movie-dropdown input::placeholder {
+  color: rgba(247, 241, 232, 0.45);
+}
+
+.movie-dropdown input:focus {
+  border-color: #f0b843;
+  box-shadow: 0 0 0 3px rgba(240, 184, 67, 0.18);
+}
+
+/* Recommend button same row */
+.search-row > button {
+  height: 56px;
+  min-width: 155px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: #f0b843;
+  color: #111111;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.search-row > button:hover {
+  background: #ffd166;
+  transform: translateY(-1px);
+}
+
+.search-row > button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ==============================
+   Dropdown menu design fix
+   ============================== */
+
+.movie-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #12121b;
+  border: 1px solid rgba(245, 185, 66, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  padding: 8px;
+}
+
+/* Important: this fixes yellow dropdown buttons */
+button.movie-dropdown-item {
+  width: 100%;
+  display: block;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent !important;
+  color: #f7f1e8 !important;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button.movie-dropdown-item:hover {
+  background: rgba(240, 184, 67, 0.14) !important;
+  color: #f0b843 !important;
+}
+
+.movie-dropdown-item.disabled {
+  color: rgba(247, 241, 232, 0.45) !important;
+  cursor: default;
+}
+
+.movie-dropdown-item.disabled:hover {
+  background: transparent !important;
+  color: rgba(247, 241, 232, 0.45) !important;
+}
+
+/* Movie count text */
+.movie-count {
+  margin-top: 12px;
+  color: rgba(220, 220, 235, 0.75);
+  font-size: 13px;
+}
+
+/* Scrollbar inside dropdown */
+.movie-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.movie-dropdown-menu::-webkit-scrollbar-track {
+  background: #0d0d14;
+  border-radius: 10px;
+}
+
+.movie-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(240, 184, 67, 0.7);
+  border-radius: 10px;
+}
+
+/* Mobile responsive */
+@media (max-width: 700px) {
+  .search-row {
+    flex-direction: column;
+  }
+
+  .search-row > button {
+    width: 100%;
+  }
+}
+
+
+/* Movie poster card styling */
+.movie-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-poster {
+  width: 100%;
+  height: 330px;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+  background: #111118;
+  border-bottom: 1px solid rgba(245, 185, 66, 0.25);
+}
+
+.movie-card .ticket__main {
+  padding: 18px;
+}
+
+.movie-card .ticket__title {
+  margin-top: 8px;
+}
+
+/* Dropdown and search layout fix */
+.search-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+}
+
+.movie-dropdown {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.movie-dropdown input {
+  width: 100%;
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 185, 66, 0.45);
+  background: #0d0d14;
+  color: #f7f1e8;
+  font-size: 16px;
+  outline: none;
+}
+
+.movie-dropdown input::placeholder {
+  color: rgba(247, 241, 232, 0.45);
+}
+
+.movie-dropdown input:focus {
+  border-color: #f0b843;
+  box-shadow: 0 0 0 3px rgba(240, 184, 67, 0.18);
+}
+
+.search-row > button {
+  height: 56px;
+  min-width: 155px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: #f0b843;
+  color: #111111;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.search-row > button:hover {
+  background: #ffd166;
+  transform: translateY(-1px);
+}
+
+.search-row > button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.movie-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #12121b;
+  border: 1px solid rgba(245, 185, 66, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  padding: 8px;
+}
+
+button.movie-dropdown-item {
+  width: 100%;
+  display: block;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent !important;
+  color: #f7f1e8 !important;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button.movie-dropdown-item:hover {
+  background: rgba(240, 184, 67, 0.14) !important;
+  color: #f0b843 !important;
+}
+
+.movie-dropdown-item.disabled {
+  color: rgba(247, 241, 232, 0.45) !important;
+  cursor: default;
+}
+
+.movie-count {
+  margin-top: 12px;
+  color: rgba(220, 220, 235, 0.75);
+  font-size: 13px;
+}
+
+.movie-dropdown-menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.movie-dropdown-menu::-webkit-scrollbar-track {
+  background: #0d0d14;
+  border-radius: 10px;
+}
+
+.movie-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(240, 184, 67, 0.7);
+  border-radius: 10px;
+}
+
+@media (max-width: 700px) {
+  .search-row {
+    flex-direction: column;
+  }
+
+  .search-row > button {
+    width: 100%;
+  }
+
+  .movie-poster {
+    height: 260px;
+  }
+}
+
+.movie-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.movie-poster {
+  width: 100%;
+  height: 330px;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+  background: #111118;
+  border-bottom: 1px solid rgba(245, 185, 66, 0.25);
+}
+
+.movie-card .ticket__main {
+  padding: 18px;
+}
+
+.movie-card .ticket__title {
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .movie-poster {
+    height: 260px;
+  }
+}
