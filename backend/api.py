@@ -19,7 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 load_dotenv()
 
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "").rstrip("/")
 
 
 # ==============================
@@ -31,7 +31,7 @@ PLACEHOLDER_POSTER = "https://via.placeholder.com/500x750?text=No+Poster"
 
 
 # ==============================
-# Create FastAPI app
+# FastAPI app
 # ==============================
 
 app = FastAPI()
@@ -39,41 +39,43 @@ app = FastAPI()
 
 # ==============================
 # CORS setup
-# Allows frontend to call backend
+# This allows localhost and Vercel frontend
 # ==============================
+
+allowed_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://cinematch-movie-recommender-hazel.vercel.app",
+]
+
+if FRONTEND_URL:
+    allowed_origins.append(FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        FRONTEND_URL,
-    ],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
 # ==============================
-# Load movies data
-# IMPORTANT:
-# Only movies.pkl is used.
-# similarity.pkl is NOT used because it is too large for GitHub/Railway.
+# Load movies.pkl safely
 # ==============================
 
-movies = pickle.load(open("movies.pkl", "rb"))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MOVIES_PATH = os.path.join(BASE_DIR, "movies.pkl")
 
-
-# ==============================
-# Prepare movie titles for searching
-# ==============================
+movies = pickle.load(open(MOVIES_PATH, "rb"))
 
 movies["title_lower"] = movies["title"].str.lower().str.strip()
 
 
 # ==============================
-# Create vectors from movie tags
-# This replaces similarity.pkl
+# Create vectors from tags
+# No similarity.pkl needed
 # ==============================
 
 cv = CountVectorizer(
@@ -85,24 +87,15 @@ vectors = cv.fit_transform(movies["tags"])
 
 
 # ==============================
-# Poster cache
-# This avoids calling TMDB again and again for same movie
+# Cache posters
 # ==============================
 
 poster_cache = {}
 
 
-# ==============================
-# Request body model
-# ==============================
-
 class MovieRequest(BaseModel):
     movie: str
 
-
-# ==============================
-# Fetch movie poster from TMDB
-# ==============================
 
 def fetch_poster(movie_id):
     """
@@ -137,13 +130,8 @@ def fetch_poster(movie_id):
         poster_url = PLACEHOLDER_POSTER
 
     poster_cache[movie_id] = poster_url
-
     return poster_url
 
-
-# ==============================
-# Convert movie row to response object
-# ==============================
 
 def movie_object(row):
     return {
@@ -153,10 +141,6 @@ def movie_object(row):
     }
 
 
-# ==============================
-# Home route
-# ==============================
-
 @app.get("/")
 def home():
     return {
@@ -164,9 +148,12 @@ def home():
     }
 
 
-# ==============================
-# Movies list route for dropdown
-# ==============================
+@app.get("/health")
+def health():
+    return {
+        "status": "ok"
+    }
+
 
 @app.get("/movies")
 def get_movies():
@@ -175,17 +162,12 @@ def get_movies():
     }
 
 
-# ==============================
-# Recommendation route
-# ==============================
-
 @app.post("/recommend")
 def recommend_movie(request: MovieRequest):
     movie_name = request.movie.lower().strip()
 
     matched_movies = movies[movies["title_lower"] == movie_name]
 
-    # If movie is not found, return close suggestions
     if matched_movies.empty:
         close_matches = get_close_matches(
             movie_name,
@@ -206,14 +188,13 @@ def recommend_movie(request: MovieRequest):
             "suggestions": suggestions,
         }
 
-    # Get selected movie index
     movie_index = matched_movies.index[0]
 
-    # Calculate similarity only for selected movie
-    # This avoids loading huge similarity.pkl file
-    distances = cosine_similarity(vectors[movie_index], vectors).flatten()
+    distances = cosine_similarity(
+        vectors[movie_index],
+        vectors
+    ).flatten()
 
-    # Sort by similarity score and get top 5
     movie_list = sorted(
         list(enumerate(distances)),
         reverse=True,
