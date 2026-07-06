@@ -1,0 +1,9 @@
+backend/
+app.py
+main.py
+tmdb_5000_movies.csv
+tmdb_5000_credits.csv
+__pycache__/
+*.pkl
+.venv/
+venv/
