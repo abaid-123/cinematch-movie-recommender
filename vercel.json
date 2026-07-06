@@ -1,6 +1,6 @@
 {
-  "installCommand": "cd frontend/movie-recommender && npm install",
-  "buildCommand": "cd frontend/movie-recommender && npm run build",
-  "outputDirectory": "frontend/movie-recommender/dist",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "framework": "vite"
 }
